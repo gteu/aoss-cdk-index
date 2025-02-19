@@ -58,50 +58,58 @@ export class AossCdkIndexStack extends cdk.Stack {
 
     collection.addDependency(collectionEncryptionPolicy);
 
-    new CfnSecurityPolicy(this, "CollectionNetworkPolicy", {
-      name: "network-policy",
-      type: "network",
-      policy: JSON.stringify([
-        {
-          Rules: [
-            {
-              ResourceType: "collection",
-              Resource: [`collection/${collection.name}`],
-            },
-            {
-              ResourceType: "dashboard",
-              Resource: [`collection/${collection.name}`],
-            },
-          ],
-          AllowFromPublic: true,
-        },
-      ]),
-    });
+    const collectionNetworkPolicy = new CfnSecurityPolicy(
+      this,
+      "CollectionNetworkPolicy",
+      {
+        name: "network-policy",
+        type: "network",
+        policy: JSON.stringify([
+          {
+            Rules: [
+              {
+                ResourceType: "collection",
+                Resource: [`collection/${collection.name}`],
+              },
+              {
+                ResourceType: "dashboard",
+                Resource: [`collection/${collection.name}`],
+              },
+            ],
+            AllowFromPublic: true,
+          },
+        ]),
+      }
+    );
 
-    new CfnAccessPolicy(this, "CollectionAccessPolicy", {
-      name: "access-policy",
-      type: "data",
-      policy: JSON.stringify([
-        {
-          Rules: [
-            {
-              ResourceType: "collection",
-              Resource: [`collection/${collection.name}`],
-              Permission: ["aoss:*"],
-            },
-            {
-              ResourceType: "index",
-              Resource: [`index/${collection.name}/*`],
-              Permission: ["aoss:*"],
-            },
-          ],
-          Principal: [
-            `arn:aws:iam::${cdk.Stack.of(this).account}:role/Admin`,
-            updateIndexFunction.role!.roleArn,
-          ],
-        },
-      ]),
-    });
+    const collectionAccessPolicy = new CfnAccessPolicy(
+      this,
+      "CollectionAccessPolicy",
+      {
+        name: "access-policy",
+        type: "data",
+        policy: JSON.stringify([
+          {
+            Rules: [
+              {
+                ResourceType: "collection",
+                Resource: [`collection/${collection.name}`],
+                Permission: ["aoss:*"],
+              },
+              {
+                ResourceType: "index",
+                Resource: [`index/${collection.name}/*`],
+                Permission: ["aoss:*"],
+              },
+            ],
+            Principal: [
+              `arn:aws:iam::${cdk.Stack.of(this).account}:role/Admin`,
+              updateIndexFunction.role!.roleArn,
+            ],
+          },
+        ]),
+      }
+    );
 
     const updateIndexProvider = new Provider(this, "UpdateIndexProvider", {
       onEventHandler: updateIndexFunction,
@@ -117,12 +125,20 @@ export class AossCdkIndexStack extends cdk.Stack {
       },
     };
 
-    new cdk.CustomResource(this, "UpdateIndexResource", {
-      serviceToken: updateIndexProvider.serviceToken,
-      properties: {
-        IndexName: "my-index",
-        IndexBody: JSON.stringify(indexDefinition),
-      },
-    });
+    const updateIndexResource = new cdk.CustomResource(
+      this,
+      "UpdateIndexResource",
+      {
+        serviceToken: updateIndexProvider.serviceToken,
+        properties: {
+          IndexName: "my-index",
+          IndexBody: JSON.stringify(indexDefinition),
+        },
+      }
+    );
+
+    updateIndexResource.node.addDependency(collectionAccessPolicy);
+    updateIndexResource.node.addDependency(collectionNetworkPolicy);
+    updateIndexResource.node.addDependency(collectionEncryptionPolicy);
   }
 }

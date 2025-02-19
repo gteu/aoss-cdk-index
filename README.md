@@ -1,14 +1,5 @@
-# Welcome to your CDK TypeScript project
+# AOSS CDK Index
 
-This is a blank project for CDK development with TypeScript.
+This sample project demonstrates how to manage OpenSearch Serverless indices using AWS CDK. It leverages custom resources to create, update, and delete indices in OpenSearch.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
-
-## Useful commands
-
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `npx cdk deploy`  deploy this stack to your default AWS account/region
-* `npx cdk diff`    compare deployed stack with current state
-* `npx cdk synth`   emits the synthesized CloudFormation template
+**Note:** This implementation only supports adding new fields to the index mappings. If you need to delete fields or change field types, additional implementation is required.
