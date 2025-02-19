@@ -22,7 +22,7 @@ def handler(event, context):
     )
 
     index_name = event['ResourceProperties']['IndexName']
-    index_body = json.loads(event['ResourceProperties']['IndexBody'])
+    index_body = event['ResourceProperties']['IndexBody']
 
     if event['RequestType'] == 'Create':
         response = client.indices.create(index=index_name, body=index_body)

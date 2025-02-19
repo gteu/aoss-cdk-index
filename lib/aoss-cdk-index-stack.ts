@@ -120,7 +120,7 @@ export class AossCdkIndexStack extends cdk.Stack {
         properties: {
           title: { type: "text" },
           content: { type: "text" },
-          // timestamp: { type: "date" }, // コメントアウト外して index update を確認
+          // timestamp: { type: "date" }, // uncomment して index update を確認
         },
       },
     };
@@ -132,7 +132,7 @@ export class AossCdkIndexStack extends cdk.Stack {
         serviceToken: updateIndexProvider.serviceToken,
         properties: {
           IndexName: "my-index",
-          IndexBody: JSON.stringify(indexDefinition),
+          IndexBody: indexDefinition,
         },
       }
     );
